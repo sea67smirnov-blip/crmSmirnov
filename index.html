@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -114,13 +115,44 @@ tbody tr:last-child td{border-bottom:0}
   .stat{padding:16px}
 }
 
+
+/* Простая клиентская авторизация */
+body:not(.crm-authenticated) main { display: none; }
+#authGate{min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at 15% 5%,#1b3448 0,transparent 42%),var(--bg)}
+#authCard{width:min(100%,420px);padding:28px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#172433,#111b27);box-shadow:0 18px 55px #0007}
+#authCard h1{font-size:24px;margin:0 0 8px}
+#authCard p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 22px}
+#authCard .auth-field{margin:0 0 14px}
+#authCard input{margin-top:7px}
+#authError{min-height:19px;color:#ff8995;font-size:13px;margin-top:12px}
+#authSubmit{width:100%;margin-top:6px}
+
 </style>
 </head>
 <body>
+
+<section id="authGate" aria-label="Вход в CRM">
+  <form id="authCard" autocomplete="on">
+    <div class="brandmark" aria-hidden="true" style="margin-bottom:18px">🚚</div>
+    <h1>Вход в CRM</h1>
+    <p>Смирнов Е. А., грузоперевозки</p>
+    <div class="auth-field">
+      <label for="authLogin">Логин</label>
+      <input id="authLogin" name="username" type="text" autocomplete="username" required>
+    </div>
+    <div class="auth-field">
+      <label for="authPassword">Пароль</label>
+      <input id="authPassword" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button class="primary" id="authSubmit" type="submit">Войти</button>
+    <div id="authError" role="alert"></div>
+  </form>
+</section>
+
 <main>
 <header>
  <div class="brandline"><div class="brandmark" aria-hidden="true">🚚</div><div><h1>Смирнов Е. А., грузоперевозки</h1><div class="muted">Управление поездками, финансами и оплатами</div></div></div>
- <button class="secondary" id="refreshBtn" type="button">Обновить данные</button>
+ <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" id="refreshBtn" type="button">Обновить данные</button><button class="secondary" id="logoutBtn" type="button">Выйти</button></div>
 </header>
 
 <section class="panel" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
@@ -296,7 +328,48 @@ $('currentMonthBtn').addEventListener('click',()=>{
  $('monthFilter').value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
  render();
 });
-loadTrips();
+
+// Лёгкая авторизация только на стороне браузера.
+// Данные входа находятся в HTML/JavaScript и не являются надёжной защитой.
+const CRM_LOGIN = 'Смирнов';
+const CRM_PASSWORD = '12341234';
+const AUTH_SESSION_KEY = 'crm_session_active';
+
+function enterCrm(){
+  document.body.classList.add('crm-authenticated');
+  $('authGate').style.display = 'none';
+  loadTrips();
+}
+
+$('authCard').addEventListener('submit', e => {
+  e.preventDefault();
+  const login = $('authLogin').value.trim();
+  const password = $('authPassword').value;
+  if(login === CRM_LOGIN && password === CRM_PASSWORD){
+    sessionStorage.setItem(AUTH_SESSION_KEY, '1');
+    $('authError').textContent = '';
+    enterCrm();
+  }else{
+    $('authError').textContent = 'Неверный логин или пароль';
+    $('authPassword').value = '';
+    $('authPassword').focus();
+  }
+});
+
+$('logoutBtn').addEventListener('click', () => {
+  sessionStorage.removeItem(AUTH_SESSION_KEY);
+  document.body.classList.remove('crm-authenticated');
+  $('authGate').style.display = 'grid';
+  $('authCard').reset();
+  $('authLogin').focus();
+});
+
+if(sessionStorage.getItem(AUTH_SESSION_KEY) === '1'){
+  enterCrm();
+}else{
+  $('authLogin').focus();
+}
+
 </script>
 </body>
 </html>
