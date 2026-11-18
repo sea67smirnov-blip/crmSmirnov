@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM · Грузоперевозки</title>
+<style>
+
+:root{
+  color-scheme:dark;
+  --bg:#0b1018;--surface:#131d29;--surface-2:#192737;--surface-3:#203247;
+  --line:#2b4054;--text:#edf3f8;--muted:#91a4b8;--orange:#ff8a24;
+  --orange-2:#ffad55;--blue:#3c8bd9;--green:#39c58a;--red:#ff6474;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;padding:30px 18px 48px;color:var(--text);
+  background:
+    radial-gradient(ellipse at 12% 0%,#1b3448 0,transparent 38%),
+    radial-gradient(ellipse at 95% 12%,#382817 0,transparent 28%),
+    var(--bg);
+  min-height:100vh;
+}
+main{max-width:1240px;margin:auto}
+header{
+  display:flex;justify-content:space-between;align-items:center;gap:18px;
+  margin:0 0 24px;padding:20px 22px;border:1px solid #31475b;border-radius:20px;
+  background:linear-gradient(115deg,#172839 0%,#111b27 65%,#30251b 100%);
+  box-shadow:0 16px 42px #0005;position:relative;overflow:hidden
+}
+header:after{
+  content:"";position:absolute;width:190px;height:190px;right:16%;top:-130px;
+  border:1px solid #ff9a3d44;border-radius:50%;box-shadow:0 0 0 22px #ff9a3d0d,0 0 0 46px #ff9a3d08;
+  pointer-events:none
+}
+header>div{position:relative;z-index:1}
+.brandline{display:flex;align-items:center;gap:14px}
+.brandmark{
+  width:52px;height:52px;display:grid;place-items:center;border-radius:15px;
+  background:linear-gradient(145deg,var(--orange),#d85a18);color:#17130f;
+  font-size:27px;box-shadow:0 8px 22px #ff852c40
+}
+h1{font-size:clamp(22px,3vw,30px);letter-spacing:-.7px;margin:0 0 5px;font-weight:800}
+.muted{color:var(--muted);font-size:13px}
+header .muted{font-size:14px}
+.panel,.stat{
+  background:linear-gradient(145deg,#172433f5,#111b27f5);
+  border:1px solid var(--line);border-radius:17px;padding:20px;
+  box-shadow:0 10px 30px #0003
+}
+.panel{margin-bottom:18px}
+.panel h2{font-size:17px;margin:0 0 16px;letter-spacing:-.2px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+label{display:block;font-size:12px;font-weight:700;color:#b8c8d8;margin-bottom:7px;letter-spacing:.15px}
+input,select{
+  width:100%;border:1px solid #354b60;border-radius:10px;padding:12px 13px;
+  font:inherit;font-size:14px;background:#0d1722;color:var(--text);min-width:0;
+  transition:border-color .18s,box-shadow .18s,background .18s
+}
+input::placeholder{color:#71869b}
+input:focus,select:focus{outline:0;border-color:var(--orange);box-shadow:0 0 0 3px #ff8a2424;background:#101d2a}
+.actions{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
+button{
+  border:1px solid transparent;border-radius:10px;padding:11px 16px;font-weight:700;
+  font-size:13px;cursor:pointer;transition:transform .16s,filter .16s,background .16s;
+}
+button:hover{filter:brightness(1.1);transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+.primary{background:linear-gradient(135deg,#ff9b3e,#ed701c);color:#1d160f;box-shadow:0 6px 18px #f27a2633}
+.secondary{background:#24374a;border-color:#3a5269;color:#e0eaf3}
+.danger{background:#492631;border-color:#713746;color:#ffb9c1}
+button:disabled{opacity:.55;cursor:wait;transform:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.stat{position:relative;overflow:hidden;padding:19px 20px 20px}
+.stat:after{content:"";position:absolute;width:90px;height:90px;right:-25px;top:-30px;border-radius:50%;background:#ffffff08}
+.stat span{display:block;color:#9db0c2;font-size:12px;margin-bottom:9px;font-weight:650}
+.stat strong{font-size:clamp(21px,2.4vw,27px);letter-spacing:-.6px}
+.stat:nth-child(1){border-top:3px solid var(--blue)}
+.stat:nth-child(2){border-top:3px solid var(--red)}
+.stat:nth-child(3){border-top:3px solid var(--green)}
+#totalIncome{color:#7dbdff}#totalExpense{color:#ff8995}#totalProfit{color:#66e0ad}
+.toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:14px}
+.toolbar input{max-width:320px}
+.table-wrap{overflow-x:auto;border:1px solid #2b4054;border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:850px;background:#101a26}
+th,td{text-align:left;padding:13px 11px;border-bottom:1px solid #26394c;font-size:12px}
+th{color:#b9c9d8;font-weight:750;background:#1b2b3c;white-space:nowrap;text-transform:uppercase;letter-spacing:.45px;font-size:10px}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:#1a2a39}
+tbody tr:last-child td{border-bottom:0}
+.status{display:inline-block;padding:5px 9px;border-radius:99px;font-weight:750;font-size:11px;white-space:nowrap}
+.paid{background:#123d32;color:#76e2b5;border:1px solid #23694f}
+.unpaid{background:#482530;color:#ff9eaa;border:1px solid #713b49}
+.row-actions{display:flex;gap:6px}
+.row-actions button{padding:7px 9px;font-size:11px}
+#message{margin-top:13px;font-size:13px;min-height:18px;color:#b8c8d8}
+.empty{text-align:center;color:#91a4b8;padding:30px}
+#monthFilter{max-width:220px}
+@media(max-width:850px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  body{padding:14px 10px 30px}
+  header{align-items:flex-start;flex-direction:column;padding:17px;border-radius:15px}
+  header #refreshBtn{width:100%}
+  .brandmark{width:45px;height:45px;font-size:23px}
+  .grid{grid-template-columns:1fr}
+  .panel{padding:15px;border-radius:14px}
+  .toolbar{align-items:stretch;flex-direction:column}
+  .toolbar input{max-width:none}
+  .stats{gap:10px}
+  .stat{padding:16px}
+}
+
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div class="brandline"><div class="brandmark" aria-hidden="true">🚚</div><div><h1>Смирнов Е. А., грузоперевозки</h1><div class="muted">Управление поездками, финансами и оплатами</div></div></div>
+ <button class="secondary" id="refreshBtn" type="button">Обновить данные</button>
+</header>
+
+<section class="panel" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+ <label for="monthFilter" style="margin:0">Показать итоги за месяц:</label>
+ <input id="monthFilter" type="month" style="max-width:220px">
+ <button class="secondary" id="currentMonthBtn" type="button">Текущий месяц</button>
+</section>
+<section class="stats">
+ <div class="stat"><span>Общий доход за месяц</span><strong id="totalIncome">0 ₽</strong></div>
+ <div class="stat"><span>Общие расходы за месяц</span><strong id="totalExpense">0 ₽</strong></div>
+ <div class="stat"><span>Прибыль за месяц</span><strong id="totalProfit">0 ₽</strong></div>
+</section>
+
+<section class="panel">
+ <h2 id="formTitle">＋ Новая поездка</h2>
+ <form id="tripForm">
+  <div class="grid">
+   <div><label for="date">Дата поездки *</label><input id="date" type="date" required></div>
+   <div><label for="client">Клиент</label><input id="client" type="text" placeholder="Название или имя клиента"></div>
+   <div><label for="route">Маршрут *</label><input id="route" type="text" placeholder="Например, Смоленск — Москва" required></div>
+   <div><label for="income">Доход, ₽</label><input id="income" type="number" min="0" step="0.01" value="0"></div>
+   <div><label for="expense">Расход, ₽</label><input id="expense" type="number" min="0" step="0.01" value="0"></div>
+   <div><label for="status">Статус оплаты</label><select id="status"><option>Не оплачено</option><option>Оплачено</option></select></div>
+   <div><label for="paymentType">Оплата по документам</label><select id="paymentType"><option value="Оригиналы">Оригиналы</option><option value="Сканы">Сканы</option></select></div>
+   <div><label for="paymentDays">Срок оплаты, дней</label><select id="paymentDays"><option value="1">1 день</option><option value="2">2 дня</option><option value="3">3 дня</option><option value="4">4 дня</option><option value="5">5 дней</option><option value="6">6 дней</option><option value="7">7 дней</option><option value="8">8 дней</option><option value="9">9 дней</option><option value="10">10 дней</option><option value="11">11 дней</option><option value="12">12 дней</option><option value="13">13 дней</option><option value="14">14 дней</option><option value="15">15 дней</option><option value="16">16 дней</option><option value="17">17 дней</option><option value="18">18 дней</option><option value="19">19 дней</option><option value="20">20 дней</option><option value="21">21 дней</option><option value="22">22 дней</option><option value="23">23 дней</option><option value="24">24 дней</option><option value="25">25 дней</option><option value="26">26 дней</option><option value="27">27 дней</option><option value="28">28 дней</option><option value="29">29 дней</option><option value="30">30 дней</option></select></div>
+  </div>
+  <div class="actions">
+   <button class="primary" id="saveBtn" type="submit">Добавить поездку</button>
+   <button class="secondary" id="cancelBtn" type="button" hidden>Отмена редактирования</button>
+  </div>
+  <div id="message" role="status"></div>
+ </form>
+</section>
+
+<section class="panel">
+ <div class="toolbar"><div><h2 style="margin:0 0 5px">▤ Реестр поездок</h2><div class="muted">Нажми «Изменить» у нужной поездки, поправь любые поля выше и сохрани изменения</div></div><input id="search" type="search" placeholder="Поиск по клиенту или маршруту"></div>
+ <div class="table-wrap"><table>
+  <thead><tr><th>Дата</th><th>Клиент</th><th>Маршрут</th><th>Доход</th><th>Расход</th><th>Статус оплаты</th><th>Оплата по документам</th><th>Срок оплаты</th><th>Действия</th></tr></thead>
+  <tbody id="tripRows"><tr><td colspan="9" class="empty">Загружаем поездки…</td></tr></tbody>
+ </table></div>
+</section>
+</main>
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbwIELeszyS53-H-UQUXZ7shHZgoczKKzcWisBCWHaAIJSpVWKwpr5KNLRyWWBARGu0o/exec';
+const SECRET = 'CRM_Pochinok_2026_K7mP9xQ4vN8zL2';
+let trips = [];
+let editingId = null;
+
+const $ = id => document.getElementById(id);
+const money = value => new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(Number(value)||0) + ' ₽';
+function showMessage(text, error=false){$('message').textContent=text;$('message').style.color=error?'#b42318':'#16713a';}
+function api(params){
+ return new Promise((resolve,reject)=>{
+  const callback='crmCallback_'+Date.now()+'_'+Math.floor(Math.random()*100000);
+  const script=document.createElement('script');
+  const timeout=setTimeout(()=>finish(new Error('Сервер не ответил за 20 секунд')),20000);
+  function finish(err,data){
+   clearTimeout(timeout);delete window[callback];script.remove();
+   err?reject(err):resolve(data);
+  }
+  window[callback]=data=>finish(null,data);
+  const query=new URLSearchParams({...params,secret:SECRET,callback});
+  script.src=API_URL+'?'+query.toString();
+  script.onerror=()=>finish(new Error('Не удалось связаться с Google Apps Script'));
+  document.body.appendChild(script);
+ });
+}
+async function loadTrips(){
+ $('tripRows').innerHTML='<tr><td colspan="9" class="empty">Загружаем…</td></tr>';
+ try{
+  const result=await api({action:'list'});
+  if(!result.success) throw new Error(result.error||'Ошибка чтения таблицы');
+  trips=Array.isArray(result.trips)?result.trips:[];
+  render();
+ }catch(e){
+  $('tripRows').innerHTML='<tr><td colspan="9" class="empty">Не удалось загрузить данные</td></tr>';
+  showMessage(e.message,true);
+ }
+}
+function escapeHtml(value){
+ return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function render(){
+ const q=$('search').value.trim().toLowerCase();
+ const selectedMonthForRows=$('monthFilter').value;
+ const shown=trips.filter(t=>{
+  const matchesMonth=!selectedMonthForRows || normalizeTripDate(t.date).slice(0,7)===selectedMonthForRows;
+  const matchesSearch=[t.client,t.route,t.date].some(v=>String(v||'').toLowerCase().includes(q));
+  return matchesMonth && matchesSearch;
+ });
+ $('tripRows').innerHTML=shown.length?shown.map(t=>`
+ <tr>
+  <td>${escapeHtml(t.date)}</td><td>${escapeHtml(t.client)}</td><td>${escapeHtml(t.route)}</td>
+  <td>${money(t.income)}</td><td>${money(t.expense)}</td>
+  <td><span class="status ${t.status==='Оплачено'?'paid':'unpaid'}">${escapeHtml(t.status||'Не оплачено')}</span></td>
+  <td>${escapeHtml(t.paymentType||'—')}</td>
+  <td>${t.paymentDays ? `${escapeHtml(t.paymentDays)} ${Number(t.paymentDays)===1?'день':Number(t.paymentDays)>=2&&Number(t.paymentDays)<=4?'дня':'дней'}` : '—'}</td>
+  <td><div class="row-actions"><button class="secondary" data-edit="${escapeHtml(t.id)}">Изменить</button><button class="danger" data-delete="${escapeHtml(t.id)}">Удалить</button></div></td>
+ </tr>`).join(''):'<tr><td colspan="9" class="empty">Поездок пока нет</td></tr>';
+ const selectedMonth=$('monthFilter').value;
+ const monthTrips=selectedMonth
+  ? trips.filter(t=>normalizeTripDate(t.date).slice(0,7)===selectedMonth)
+  : [];
+ const income=monthTrips.reduce((s,t)=>s+(Number(t.income)||0),0);
+ const expense=monthTrips.reduce((s,t)=>s+(Number(t.expense)||0),0);
+ $('totalIncome').textContent=money(income);
+ $('totalExpense').textContent=money(expense);
+ $('totalProfit').textContent=money(income-expense);
+}
+function normalizeTripDate(value){
+ const raw=String(value||'').trim();
+ if(/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw;
+ const ru=raw.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
+ if(ru) return `${ru[3]}-${String(ru[2]).padStart(2,'0')}-${String(ru[1]).padStart(2,'0')}`;
+ const parsed=new Date(raw);
+ return Number.isNaN(parsed.getTime())?'':`${parsed.getFullYear()}-${String(parsed.getMonth()+1).padStart(2,'0')}-${String(parsed.getDate()).padStart(2,'0')}`;
+}
+function resetForm(){
+ editingId=null;$('tripForm').reset();$('income').value='0';$('expense').value='0';
+ $('formTitle').textContent='Добавить поездку';$('saveBtn').textContent='Добавить поездку';$('cancelBtn').hidden=true;
+}
+$('tripForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const data={
+  date:$('date').value,client:$('client').value.trim(),route:$('route').value.trim(),
+  income:Number($('income').value)||0,expense:Number($('expense').value)||0,
+  status:$('status').value,
+  paymentType:$('paymentType').value,
+  paymentDays:Number($('paymentDays').value)||1
+ };
+ if(editingId)data.id=editingId;
+ $('saveBtn').disabled=true;showMessage(editingId?'Сохраняю изменения…':'Добавляю поездку…');
+ try{
+  const result=await api({action:editingId?'update':'add',data:JSON.stringify(data)});
+  if(!result.success)throw new Error(result.error||'Не удалось сохранить поездку');
+  showMessage(editingId?'Изменения сохранены':'Поездка добавлена');
+  resetForm();await loadTrips();
+ }catch(err){showMessage(err.message,true);}
+ finally{$('saveBtn').disabled=false;}
+});
+$('tripRows').addEventListener('click',async e=>{
+ const edit=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]');
+ if(edit){
+  const t=trips.find(x=>String(x.id)===edit.dataset.edit);if(!t)return;
+  editingId=t.id;
+  $('date').value=t.date||'';$('client').value=t.client||'';$('route').value=t.route||'';
+  $('income').value=Number(t.income)||0;$('expense').value=Number(t.expense)||0;
+  $('status').value=t.status||'Не оплачено';
+  $('paymentType').value=t.paymentType||'Оригиналы';
+  $('paymentDays').value=String(t.paymentDays||1);
+  $('formTitle').textContent='Редактировать поездку';$('saveBtn').textContent='Сохранить изменения';$('cancelBtn').hidden=false;
+  window.scrollTo({top:0,behavior:'smooth'});
+ }
+ if(del){
+  const id=del.dataset.delete;
+  if(!confirm('Удалить эту поездку из Google Таблицы?'))return;
+  del.disabled=true;
+  try{
+   const result=await api({action:'delete',id});
+   if(!result.success)throw new Error(result.error||'Не удалось удалить поездку');
+   showMessage('Поездка удалена');if(String(editingId)===String(id))resetForm();await loadTrips();
+  }catch(err){showMessage(err.message,true);del.disabled=false;}
+ }
+});
+$('cancelBtn').addEventListener('click',resetForm);
+$('refreshBtn').addEventListener('click',loadTrips);
+$('search').addEventListener('input',render);
+const now=new Date();
+$('monthFilter').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+$('monthFilter').addEventListener('change',render);
+$('currentMonthBtn').addEventListener('click',()=>{
+ const today=new Date();
+ $('monthFilter').value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+ render();
+});
+loadTrips();
+</script>
+</body>
+</html>
